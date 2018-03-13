@@ -12,6 +12,17 @@ const io = socketIO(server)
 io.on('connection', socket => {
   console.log('new user connected')
 
+  socket.emit('newMessage', {
+    from: 'user1',
+    text: 'sup',
+    createdAt: new Date()
+  })
+
+  socket.on('createMessage', (newMessage) => {
+    newMessage.createdAt = new Date()
+    console.log('new message', newMessage)
+  })
+  
   socket.on('disconnect', () => {
     console.log('client disconnected')
   })
