@@ -9,25 +9,24 @@ const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
 
+app.use(express.static(publicPath))
+
 io.on('connection', socket => {
   console.log('new user connected')
 
-  socket.emit('newMessage', {
-    from: 'user1',
-    text: 'sup',
-    createdAt: new Date()
-  })
+  socket.on('createMessage', (message) => {
+    console.log('new message', message)
 
-  socket.on('createMessage', (newMessage) => {
-    newMessage.createdAt = new Date()
-    console.log('new message', newMessage)
+    io.emit('newMessage', {
+      from: message.text,
+      text: message.text,
+      createdAt: new Date().getTime()  
+    })
   })
   
   socket.on('disconnect', () => {
     console.log('client disconnected')
   })
 })
-
-app.use(express.static(publicPath))
 
 server.listen(PORT, () => console.log(`App listening on port ${PORT}`))

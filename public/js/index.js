@@ -2,11 +2,6 @@ const socket = io()
 
 socket.on('connect', () => {
   console.log('connected to server')  
-
-  socket.emit('createMessage', {
-    from: 'user2',
-    text: 'dunno'
-  })
 })
 
 socket.on('disconnect', () => {
@@ -14,9 +9,5 @@ socket.on('disconnect', () => {
 })
 
 socket.on('newMessage', (message) => {
-  console.log('new email', message)
-})
-
-socket.on('newMessage', (newMessage) => {
-  console.log(newMessage)
+  console.log('new message', message)
 })
