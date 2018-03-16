@@ -4,41 +4,56 @@ function scrollToBottom() {
   // selectors
   const messages = $('#message-list')
   const newMessage = messages.children('li:last-child')
-  console.log(newMessage)
   // heights
   const clientHeight = messages.prop('clientHeight')
-  console.log('clientHieght', clientHeight)
   const scrollTop = messages.prop('scrollTop')
-  console.log("scrollTop", scrollTop)
   const scrollHeight = messages.prop('scrollHeight')
-  console.log("scrollHeight", scrollHeight)
   const newMessageHeight = newMessage.innerHeight()
-  console.log('messageHeight', newMessageHeight)
   const lastMessageHeight = newMessage.prev().innerHeight()
 
-  console.log(clientHeight + scrollTop + newMessageHeight + lastMessageHeight, scrollHeight)
   if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
     messages.scrollTop(scrollHeight)
   }
 }
 
 socket.on('connect', () => {
-  console.log('connected to server')  
+  const params = $.deparam()
+
+  socket.emit('join', params, (err) => {
+    if (err) {
+      alert(err)
+      window.location.href = '/'
+      return
+    }
+
+    console.log('No err')
+  })
 })
 
 socket.on('disconnect', () => {
   console.log('disconnected from server')
 })
 
+socket.on('updateUserList', users => {
+  console.log('users', users)
+
+  const ol = $('<ol></ol>')
+
+  users.forEach(user => {
+    ol.append($("<li></li>").text(user))
+  })
+
+  $('#users').html(ol)
+})
+
 socket.on('newMessage', (message) => {
-  const formattedTime = moment(message.createdAt).format("h:mm a")
+  const formattedTime = moment(message.createdAt).format('h:mm a')
   
   const template = $('#message-template').html()
   const html = Mustache.render(template, {
     text: message.text,
     createdAt: formattedTime
   })
-  console.log(html)
 
   $('#message-list').append(html)
 
@@ -48,13 +63,13 @@ socket.on('newMessage', (message) => {
 socket.on('newLocationMessage', (message) => {
   const formattedTime = moment(message.createdAt).format('h:mm a')
 
-  const template = $("#location-message-template").html()
+  const template = $('#location-message-template').html()
   const html = Mustache.render(template, {
     url: message.url,
     createdAt: formattedTime
   })
 
-  $("#message-list").append(html)  
+  $('#message-list').append(html)  
 
   // scrollToBottom()
 })
